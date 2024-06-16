@@ -14,6 +14,8 @@ Users should be able to search for cryptocurrency details from a third-party API
 The API endpoint for fetching data is `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC,ETH,LTC`
 
 ### Validation and Security:
-Implement basic validation and secure API endpoints.
+Implement basic validation and secure API endpoints, which is as follows:
+
 Username: Only characters and digits, length 4 to 15.
+
 Password: Length 8 to 15, with at least 1 upper case, 1 lower case, 1 digit, and 1 special character.
