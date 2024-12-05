@@ -1,17 +1,26 @@
 package com.crudapp.demoapi.model;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
-@Entity
 @Data
-@Table(name="CRYPTODETAILS")
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CryptoDetails {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
 
-    private Timestamp timestamp;
+    private Map<String,CoinData> data;
+
+    @JsonAnySetter
+    public void setBitCoinData(Map<String,CoinData> bitCoinDataMap){
+        this.data=bitCoinDataMap;
+    }
+
 }

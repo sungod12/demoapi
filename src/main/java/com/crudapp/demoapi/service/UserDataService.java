@@ -1,6 +1,6 @@
 package com.crudapp.demoapi.service;
 
-import com.crudapp.demoapi.model.User;
+import com.crudapp.demoapi.model.Users;
 import com.crudapp.demoapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +13,13 @@ public class UserDataService {
     @Autowired
     private UserRepository userRepository;
 
-    public void saveUserDetails(User user) {
+    public void saveUserDetails(Users user) {
         userRepository.save(user);
     }
 
-    public User getUserDetails(String userName) {
-        List<User> userList = userRepository.findByUserName(userName);
-        Optional<User> optionalUser = userList.stream().filter(user1 -> user1.getUserName().equals(userName)).findFirst();
+    public Users getUserDetails(String userName) {
+        List<Users> userList = userRepository.getByUserName(userName);
+        Optional<Users> optionalUser = userList.stream().filter(user1 -> user1.getUserName().equals(userName)).findFirst();
         return optionalUser.orElse(null);
     }
 }
