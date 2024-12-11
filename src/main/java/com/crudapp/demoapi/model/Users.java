@@ -9,6 +9,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,6 +24,8 @@ public class Users {
     @NotBlank
     private String fullName;
 
+    @Column(unique = true)
+    @Pattern(regexp = "^[0-9]{10}",message = "Phone number must contain 10 digits")
     private String phoneNumber;
 
     @Column(unique = true)
@@ -33,7 +36,10 @@ public class Users {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).*$",message = "Password must contain atleast one uppercase,one lowercase,one digit and one special character")
     private String password;
 
-    @ManyToMany()
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="user_roles",joinColumns = @JoinColumn(name="user_id"),inverseJoinColumns = @JoinColumn(name="role_id"))
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Post> posts;
 }
