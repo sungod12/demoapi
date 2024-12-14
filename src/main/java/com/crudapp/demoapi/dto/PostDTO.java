@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 
 @Data
 public class PostDTO {
-    private String userId;
+    private Long userId;
 
     private Long postId;
 

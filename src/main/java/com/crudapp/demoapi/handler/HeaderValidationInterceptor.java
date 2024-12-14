@@ -1,3 +1,4 @@
+/*
 package com.crudapp.demoapi.handler;
 
 import io.micrometer.common.util.StringUtils;
@@ -23,3 +24,4 @@ public class HeaderValidationInterceptor implements HandlerInterceptor {
         return true;
     }
 }
+*/

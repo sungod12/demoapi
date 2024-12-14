@@ -6,18 +6,18 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MapperService {
-    public PostDTO getPostDTO(Post post){
-        ModelMapper modelMapper= new ModelMapper();
-        modelMapper.addMappings(new PropertyMap<Post, PostDTO>() {
 
-            @Override
-            protected void configure() {
-                map(source.getPost(),destination.getContent());
-                map(source.getUser().getId(),destination.getUserId());
-            }
-        });
+    ModelMapper modelMapper=new ModelMapper();
+
+    public PostDTO getPostDTO(Post post){
         return modelMapper.map(post, PostDTO.class);
+    }
+
+    public List<PostDTO> getPostsDTOs(List<Post> posts) {
+        return posts.stream().map(this::getPostDTO).toList();
     }
 }

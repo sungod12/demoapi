@@ -5,21 +5,12 @@ import com.crudapp.demoapi.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -37,8 +28,7 @@ public class WebSecurityConfig {
 
         return httpSecurity.headers(header -> header.frameOptions(frameOptions -> frameOptions.sameOrigin())).authorizeHttpRequests(auth ->
                         auth.requestMatchers("/h2-console/**", "/api/register").permitAll().
-                                requestMatchers("/api/login","/api/createPost","/api/updatePost").hasRole("USER").
-                                requestMatchers("/api/updateDetails").hasRole("USER").anyRequest().hasAnyRole("ANONYMOUS")
+                                requestMatchers("/api/**").hasRole("USER").anyRequest().hasAnyRole("ANONYMOUS")
                 ).csrf(AbstractHttpConfigurer::disable).
                 httpBasic(Customizer.withDefaults()).
                 formLogin(AbstractHttpConfigurer::disable).

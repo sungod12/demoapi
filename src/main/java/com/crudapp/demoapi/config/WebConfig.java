@@ -1,3 +1,4 @@
+/*
 package com.crudapp.demoapi.config;
 
 import com.crudapp.demoapi.handler.HeaderValidationInterceptor;
@@ -16,3 +17,4 @@ public class WebConfig implements WebMvcConfigurer {
         interceptorRegistry.addInterceptor(headerValidationInterceptor).addPathPatterns("/api/**");
     }
 }
+*/

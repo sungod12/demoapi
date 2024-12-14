@@ -9,6 +9,7 @@ import com.crudapp.demoapi.model.Users;
 import com.crudapp.demoapi.repository.PostRepository;
 import com.crudapp.demoapi.repository.RolesRepository;
 import com.crudapp.demoapi.service.MapperService;
+import com.crudapp.demoapi.service.PostDataService;
 import com.crudapp.demoapi.service.UserDataService;
 import com.google.gson.Gson;
 import jakarta.annotation.PostConstruct;
@@ -36,10 +37,7 @@ class CrudApiController {
     private UserDataService userDataService;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private RolesRepository rolesRepository;
+    private PostDataService postDataService;
 
     @Autowired
     private PostRepository postRepository;
@@ -47,43 +45,28 @@ class CrudApiController {
     @Autowired
     private MapperService mapperService;
 
-    private List<Role> roleList;
-
-    @PostConstruct
-    private void getRolesList() {
-        roleList = rolesRepository.findAll();
-    }
-
+    //TODO - Refactor this to have code in userDataService - Done
     @PostMapping("/register")
     ResponseEntity<String> signUp(@RequestBody @Valid Users user) {
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        user.setRoles(roleList.stream().filter(role -> role.getRole().equalsIgnoreCase("user")).collect(Collectors.toSet()));
-        userDataService.saveUserDetails(user);
+        userDataService.registerUser(user);
         return new ResponseEntity<>("SignUp Successful", HttpStatus.CREATED);
     }
-
 
     @PostMapping("/login")
     ResponseEntity<String> signIn() {
         return new ResponseEntity<>("Login Successful", HttpStatus.OK);
     }
 
+    //TODO - Refactor this to have code in userDataService - Done
     @PutMapping("/updateDetails")
     ResponseEntity<String> updateUserDetails(@RequestBody @Valid Users user, HttpServletRequest request) {
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        Users retrievedUser = userDataService.getUserDetails(authentication.getName());
-        retrievedUser.setUserName(user.getUserName());
-        retrievedUser.setFullName(user.getFullName());
-        retrievedUser.setPhoneNumber(user.getPhoneNumber());
-        retrievedUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userDataService.saveUserDetails(retrievedUser);
+        userDataService.updateUserDetails(user);
         return new ResponseEntity<>("Update successful", HttpStatus.OK);
     }
 
+    //TODO - Refactor this to have code in postDataService
     @PostMapping("/createPost")
     ResponseEntity<PostDTO> createPost(@RequestBody Post post){
-        ModelMapper modelMapper=new ModelMapper();
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         Users retrievedUser = userDataService.getUserDetails(authentication.getName());
         post.setUser(retrievedUser);
@@ -93,11 +76,18 @@ class CrudApiController {
         return new ResponseEntity<>(postDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/getPosts")
+    ResponseEntity<Object> getPosts(@RequestParam(required = false) String sortBy){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Users retrievedUser = userDataService.getUserDetails(authentication.getName());
+        List<PostDTO> postDTOs=postDataService.getPostDTOs(retrievedUser.getId(),sortBy);
+        return new ResponseEntity<>(postDTOs,HttpStatus.OK);
+    }
+
     @PutMapping("/updatePost")
     ResponseEntity<String> updatePost(){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         Users retrievedUser = userDataService.getUserDetails(authentication.getName());
-        userDataService.getPosts(String.valueOf(retrievedUser.getId()));
 //        Users retrievedUser = postRepository.findById(authentication.getName());
 //        post.setUser(retrievedUser);
 //        post.setCreated(Timestamp.from(Instant.now()));

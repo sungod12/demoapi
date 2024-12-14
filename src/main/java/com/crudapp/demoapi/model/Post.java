@@ -14,7 +14,7 @@ public class Post {
     private Long id;
 
     @Column(name = "content")
-    private String post;
+    private String content;
 
     private Timestamp created;
 

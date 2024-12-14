@@ -20,11 +20,11 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
+  /*  @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handle(BadCredentialsException methodArgumentNotValidException){
         String message=methodArgumentNotValidException.getMessage();
 //        List<String> errorMessages=fieldErrorList.stream().map(fieldError -> fieldError.getField()+": "+fieldError.getDefaultMessage()).toList();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-    }
+    }*/
 
 }
