@@ -1,6 +1,7 @@
 package com.crudapp.demoapi.service;
 
 import com.crudapp.demoapi.dto.PostDTO;
+import com.crudapp.demoapi.dto.UserDTO;
 import com.crudapp.demoapi.model.Post;
 import com.crudapp.demoapi.model.Role;
 import com.crudapp.demoapi.model.Users;
@@ -29,6 +30,9 @@ public class UserDataService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private MapperService mapperService;
+
     private List<Role> roles;
 
     @PostConstruct
@@ -36,27 +40,31 @@ public class UserDataService {
         roles = rolesRepository.findAll();
     }
 
-    public void registerUser(Users user) {
-        String encodedPassword=bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+    public UserDTO registerUser(UserDTO userDTO) {
+        Users user= mapperService.getUsers(userDTO);
+        String encodedPassword=bCryptPasswordEncoder.encode(userDTO.getPassword());
         user.setRoles(roles.stream().filter(role -> role.getRole().equalsIgnoreCase("user")).collect(Collectors.toSet()));
-        userRepository.save(user);
+        user.setPassword(encodedPassword);
+        Users registeredUser=userRepository.save(user);
+        registeredUser.setPassword(null);
+        return mapperService.getUserDTO(registeredUser);
     }
 
-    public void updateUserDetails(Users user){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        Users retrievedUser = this.getUserDetails(authentication.getName());
+    public UserDTO updateUserDetails(UserDTO user){
+        Users retrievedUser=getUserDetails();
         retrievedUser.setUserName(user.getUserName());
         retrievedUser.setFullName(user.getFullName());
         retrievedUser.setPhoneNumber(user.getPhoneNumber());
         retrievedUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userRepository.save(retrievedUser);
-
+        Users updatedUser=userRepository.save(retrievedUser);
+        updatedUser.setPassword(null);
+        return mapperService.getUserDTO(updatedUser);
     }
 
-    public Users getUserDetails(String userName) {
-        Users userList = userRepository.getByUserName(userName);
-        return Optional.of(userList).orElse(null);
+    public Users getUserDetails() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Users retrievedUser = userRepository.getByUserName(authentication.getName());
+        return Optional.of(retrievedUser).orElse(null);
     }
 }
 

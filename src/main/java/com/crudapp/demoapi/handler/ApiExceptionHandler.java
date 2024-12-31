@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 
+
+//TODO - Throw and add exceptions here in case of add/update/delete/get
 @RestControllerAdvice
 public class ApiExceptionHandler {
 

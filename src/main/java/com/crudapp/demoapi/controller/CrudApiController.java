@@ -3,6 +3,7 @@ package com.crudapp.demoapi.controller;
 //import com.crudapp.demoapi.model.Users;
 //import com.crudapp.demoapi.service.UserDataService;
 import com.crudapp.demoapi.dto.PostDTO;
+import com.crudapp.demoapi.dto.UserDTO;
 import com.crudapp.demoapi.model.Post;
 import com.crudapp.demoapi.model.Role;
 import com.crudapp.demoapi.model.Users;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,16 +42,12 @@ class CrudApiController {
     private PostDataService postDataService;
 
     @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
     private MapperService mapperService;
 
-    //TODO - Refactor this to have code in userDataService - Done
     @PostMapping("/register")
-    ResponseEntity<String> signUp(@RequestBody @Valid Users user) {
-        userDataService.registerUser(user);
-        return new ResponseEntity<>("SignUp Successful", HttpStatus.CREATED);
+    ResponseEntity<UserDTO> signUp(@RequestBody @Valid UserDTO user) {
+        UserDTO registerUser=userDataService.registerUser(user);
+        return new ResponseEntity<>(registerUser,HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
@@ -57,37 +55,33 @@ class CrudApiController {
         return new ResponseEntity<>("Login Successful", HttpStatus.OK);
     }
 
-    //TODO - Refactor this to have code in userDataService - Done
     @PutMapping("/updateDetails")
-    ResponseEntity<String> updateUserDetails(@RequestBody @Valid Users user, HttpServletRequest request) {
-        userDataService.updateUserDetails(user);
-        return new ResponseEntity<>("Update successful", HttpStatus.OK);
+    ResponseEntity<UserDTO> updateUserDetails(@RequestBody @Valid UserDTO user, HttpServletRequest request) {
+        UserDTO updatedUser=userDataService.updateUserDetails(user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    //TODO - Refactor this to have code in postDataService
     @PostMapping("/createPost")
-    ResponseEntity<PostDTO> createPost(@RequestBody Post post){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        Users retrievedUser = userDataService.getUserDetails(authentication.getName());
-        post.setUser(retrievedUser);
-        post.setCreated(Timestamp.from(Instant.now()));
-        postRepository.save(post);
-        PostDTO postDTO=mapperService.getPostDTO(post);
+    ResponseEntity<PostDTO> createPost(@RequestBody PostDTO post){
+        PostDTO postDTO= postDataService.createPost(post);
         return new ResponseEntity<>(postDTO, HttpStatus.CREATED);
     }
 
     @GetMapping("/getPosts")
-    ResponseEntity<Object> getPosts(@RequestParam(required = false) String sortBy){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        Users retrievedUser = userDataService.getUserDetails(authentication.getName());
-        List<PostDTO> postDTOs=postDataService.getPostDTOs(retrievedUser.getId(),sortBy);
+    ResponseEntity<Object> getPosts(@RequestParam(required = false,defaultValue = "updated") String sortBy,@RequestParam(required = false,defaultValue = "desc") String orderBy){
+        if(!orderBy.equalsIgnoreCase("desc") && !orderBy.equalsIgnoreCase("asc")){
+            return ResponseEntity.badRequest().body(null);
+        }
+        List<PostDTO> postDTOs=postDataService.getPostDTOs(sortBy,orderBy);
+        if(postDTOs.isEmpty()){
+            return new ResponseEntity<>("No posts found",HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>(postDTOs,HttpStatus.OK);
     }
 
+    //TODO - Add post update logic
     @PutMapping("/updatePost")
     ResponseEntity<String> updatePost(){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        Users retrievedUser = userDataService.getUserDetails(authentication.getName());
 //        Users retrievedUser = postRepository.findById(authentication.getName());
 //        post.setUser(retrievedUser);
 //        post.setCreated(Timestamp.from(Instant.now()));

@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 @Entity
 @Getter
 @Setter
@@ -25,15 +26,11 @@ public class Users {
     private String fullName;
 
     @Column(unique = true)
-    @Pattern(regexp = "^[0-9]{10}",message = "Phone number must contain 10 digits")
     private String phoneNumber;
 
     @Column(unique = true)
-    @JsonAlias(value="username")
-    @Size(min = 4,max=15,message = "Please enter valid username")
     private String userName;
 
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).*$",message = "Password must contain atleast one uppercase,one lowercase,one digit and one special character")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
